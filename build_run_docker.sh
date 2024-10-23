@@ -41,6 +41,23 @@ else
     echo 'Nginx is NOT up and running -- check reverse proxy' $dt
 fi
 
+echo 'Building and deploying reverse proxy'
+cd /home/ec2-user/website/nginx
+docker buildx build --no-cache -t site/nginx -f Dockerfile .
+docker stop mischaikow-nginx
+docker run --rm -d -p 80:80 -p 443:443 \
+    --mount 'type=volume,src=letsencrypt_keys,dst=/etc/letsencrypt' \
+    --network=mischaikow-home --name mischaikow-nginx --init site/nginx
+
+sleep 10s
+dt=$(date '+%d/%m/%Y %H:%M:%S')
+if [ "$( docker container inspect -f '{{.State.Status}}' mischaikow-nginx)" = "running" ];
+then
+    echo 'Nginx up and running' $dt
+else
+    echo 'Nginx is NOT up and running -- check reverse proxy' $dt
+fi
+
 dt=$(date '+%d/%m/%Y %H:%M:%S')
 echo 'Script complete at' $dt
 unset dt
