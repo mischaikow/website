@@ -26,7 +26,7 @@ jobs:
             --parameters commands='bash /home/ec2-user/website/build_run_docker.sh' \
             --query 'Command.CommandId' --output text)" >> $GITHUB_ENV
       - name: Wait...
-        run: sleep 45s
+        run: sleep 200s
       - name: Print Results
         run: |
           aws ssm list-command-invocations \

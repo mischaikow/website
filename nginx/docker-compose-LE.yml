@@ -1,0 +1,15 @@
+services:
+  letsencrypt:
+    image: certbot/certbot
+    command: sh -c "certbot certonly --standalone -d mischaikow.com --text --agree-tos --email mischaik@gmail.com --server https://acme-v02.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --preferred-challenges=http"
+    entrypoint: ""
+    ports:
+      - "80:80"
+    volumes:
+      - "letsencrypt:/etc/letsencrypt"
+    environment:
+      - TERM=xterm
+
+volumes:
+  letsencrypt:
+    name: letsencrypt_keys

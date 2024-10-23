@@ -3,40 +3,44 @@ cd /home/ec2-user/website
 echo 'Running git pull'
 git pull
 dt=$(date '+%d/%m/%Y %H:%M:%S')
-echo 'git pull at' $dt 
+echo 'git pull at' $dt
 
-echo 'Building and deploying backend'
-cd /home/ec2-user/website/backend
-docker buildx build --no-cache -t site/backend -f Dockerfile .
-docker stop mischaikow-backend
-docker run --rm -d -p 5000:5000 --name mischaikow-backend --init site/backend
+docker network create mischaikow-home
 
-sleep 5s
-backend=curl http://127.0.0.1:5000
+echo 'Building and deploying server'
+cd /home/ec2-user/website
+docker buildx build --no-cache -t site/server -f Dockerfile .
+docker stop mischaikow-server
+docker run --rm -d -p 3000:3000 \
+    --network=mischaikow-home --name mischaikow-server --init site/server
+
+sleep 30s
+server=curl http://127.0.0.1:3000/healthcheck
 dt=$(date '+%d/%m/%Y %H:%M:%S')
-if [ $backend == 'Backend is up' ]
+if [ $server == 'OK']
 then
-    echo 'Backend up and running' $dt
+    echo 'Server is operating' $dt
 else
-    echo 'Backend is NOT up and running -- check backend' $dt
+    echo 'Server is NOT up and running -- check server' $dt
 fi
 
-echo 'Building and deploying frontend'
-cd /home/ec2-user/website/frontend
-docker buildx build --no-cache -t site/frontend -f Dockerfile .
-docker stop mischaikow-frontend
-docker run --rm -d -p 4173:4173 --name mischaikow-frontend --init site/frontend
+echo 'Building and deploying reverse proxy'
+cd /home/ec2-user/website/nginx
+docker buildx build --no-cache -t site/nginx -f Dockerfile .
+docker stop mischaikow-nginx
+docker run --rm -d -p 80:80 -p 443:443 \
+    --mount 'type=volume,src=letsencrypt_keys,dst=/etc/letsencrypt' \
+    --network=mischaikow-home --name mischaikow-nginx --init site/nginx
 
-sleep 5s
-frontend=$(curl -o /dev/null -s -w "%{http_code}\n" -I http://127.0.0.1:4173)
+sleep 15s
 dt=$(date '+%d/%m/%Y %H:%M:%S')
-if [ "$frontend" -eq 200 ]
+if [ "$( docker container inspect -f '{{.State.Status}}' mischaikow-nginx)" = "running" ];
 then
-    echo 'Frontend up and running' $dt
+    echo 'Nginx up and running' $dt
 else
-    echo 'Frontend is NOT up and running -- check frontend' $dt
+    echo 'Nginx is NOT up and running -- check reverse proxy' $dt
 fi
 
 dt=$(date '+%d/%m/%Y %H:%M:%S')
-echo 'Script Complete at' $dt 
+echo 'Script complete at' $dt
 unset dt
