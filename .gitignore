@@ -1,11 +1,4 @@
-**/node_modules
-**/.env
-**/.env.*
-!**/.env.example
-**/.DS_Store
-backend/dist
-frontend/build
-frontend/.svelte-kit
-frontend/package
-frontend/vite.config.js.timestamp-*
-frontend/vite.config.ts.timestamp-*
+node_modules
+dist
+coverage
+**/*.code-workspace

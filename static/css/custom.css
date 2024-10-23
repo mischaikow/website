@@ -1,16 +1,17 @@
 @font-face {
-  font-family: "Vollkorn";
-  src: url("https://fonts.googleapis.com/css2?family=Vollkorn:400");
+  font-family: 'Vollkorn';
+  src: url('https://fonts.googleapis.com/css2?family=Vollkorn:400');
 }
 
 main {
   display: flex;
-  flex-direction: column;
   align-items: center;
 }
 
 body {
-  font-family: "Vollkorn", "times", serif;
+  font-family: 'Vollkorn', 'times', serif;
+  display: flex;
+  flex-direction: column;
   font-weight: 300;
 }
 
@@ -19,9 +20,12 @@ a {
   text-decoration: none;
 }
 
+.frontpage {
+  flex: 1;
+  text-align: center;
+}
+
 .frontpage-list {
-  display: flex;
-  flex-direction: column;
   margin: 40 auto;
   border-spacing: 5px;
   font-size: 17px;
