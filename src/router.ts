@@ -1,11 +1,11 @@
 import { Router } from 'express';
 
-import * as home from './routes/home.js';
+import * as index from './routes/index.js';
 
 const router = Router();
 
-router.enableRender = (path) => router.get(`/${path}`, (_req, res) => res.render(`${path}.njk`));
+router.enableRender = (path: string) => router.get(`/${path}`, (_req, res) => res.render(`${path}.njk`));
 
-router.get('/home', home.get);
+router.get('/', index.get);
 
 export default router;
