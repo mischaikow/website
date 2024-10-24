@@ -1,11 +1,25 @@
 services:
-  certbot:
-    image: certbot/certbot
-    command: sh -c "certbot certonly --standalone -d mischaikow.com --text --agree-tos --email mischaik@gmail.com --server https://acme-v02.api.letsencrypt.org/directory --rsa-key-size 4096 --verbose --keep-until-expiring --preferred-challenges=http"
-    container_name: certbot
+  nginx:
+    image: nginx:1.24.0-alpine-slim
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
     volumes:
-      - "letsencrypt:/etc/letsencrypt"
+      - ./conf/:/etc/nginx/conf.d/:ro
+      - ../../certbot/www:/var/www/certbot/:ro
+      - ../../certbot/conf/:/etc/letsencrypt/:ro
+    networks:
+      - mischaikow-home
+  certbot:
+    image: certbot/certbot:latest
+    volumes:
+      - ./letsencrypt/:/var/www/certbot/:rw
+      - ./certbot/conf/:/etc/letsencrypt/:rw
+    networks:
+      - mischaikow-home
 
-volumes:
-  letsencrypt:
-    name: letsencrypt_keys
+networks:
+  mischaikow-home:
+    name: mischaikow-home
+    external: true
