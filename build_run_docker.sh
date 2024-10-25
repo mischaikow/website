@@ -37,6 +37,8 @@ else
     echo 'Nginx is NOT up and running -- check reverse proxy' $dt
 fi
 
+docker system prune
+
 dt=$(date '+%d/%m/%Y %H:%M:%S')
 echo 'Script complete at' $dt
 unset dt

@@ -1,15 +1,29 @@
-FROM node:20.10.0@sha256:8d0f16fe841577f9317ab49011c6d819e1fa81f8d4af7ece7ae0ac815e07ac84
+FROM node:20-alpine AS base
 
-RUN wget -O /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_x86_64
-RUN chmod +x /usr/local/bin/dumb-init
-WORKDIR /usr/src/app
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-COPY pnpm-lock.yaml package.json ./
-RUN npm install -g pnpm
+
+FROM base AS prod
+
+WORKDIR /app
+COPY pnpm-lock.yaml package.json /app
 RUN pnpm install --frozen-lockfile
 
-COPY ./src ./src
+COPY . /app
 RUN pnpm build
+
+
+FROM base
+
+RUN apk add dumb-init
+
+WORKDIR /app
+
+COPY --from=prod /app/node_modules /app/node_modules
+COPY --from=prod /app/dist /app/dist
+COPY ./src /app/src
 
 COPY --chown=node:node . .
 EXPOSE 3000:3000
