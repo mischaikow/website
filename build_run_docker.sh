@@ -26,7 +26,12 @@ fi
 
 echo 'Building and deploying reverse proxy'
 cd /home/ec2-user/website/nginx
-docker-compose restart
+if [ "$( docker container inspect -f '{{.State.Status}}' nginx-nginx-1 )" = "running" ];
+then
+    docker-compose restart
+else
+    docker-compose up
+fi
 
 sleep 5s
 dt=$(date '+%d/%m/%Y %H:%M:%S')
@@ -37,7 +42,7 @@ else
     echo 'Nginx is NOT up and running -- check reverse proxy' $dt
 fi
 
-docker system prune
+docker system prune -f
 
 dt=$(date '+%d/%m/%Y %H:%M:%S')
 echo 'Script complete at' $dt
