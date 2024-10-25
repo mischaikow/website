@@ -4,7 +4,8 @@ Current iteration of mischaikow.com
 
 ## Todo
 
-- **Make this site work with AWS** This was built to replace website-2, but there are sure to be some integration problems
-- **Automate Certbot** I followed [this Stack Overflow post](https://stackoverflow.com/questions/66638368/how-to-do-auto-renewal-of-tls-certificates-with-certbot) to set up my Certbot, but haven't yet set up the cron job to check for new certs
-- **Get S3 Bucket set up** My resume really should be somewhere on my website...
-- **Clear out GitHub Actions errors** There are a litany of errors that are consequences of how I set things up. My GitHub Actions setup is hacky and not particularly robust, which leaves a lot to be desired.
+- **Automate Certbot** I followed [this blog post](https://mindsers.blog/en/post/https-using-nginx-certbot-docker/) to set up my Certbot, but haven't yet set up the cron job to auto-refresh the certs. For now, at least, I can just run `docker-compose run --rm certbot renew` from the `nginx` directory...
+- **Get S3 Bucket set up** My resume lives in the EC2 instance, but maybe it should be in S3?
+- **Get PostgreSQL database set up** Most projects of interest require some kind of relational database, which means getting it connected to EC2.
+- **Refine this site's CI/CD pipeline with AWS** The script that gets the docker containers up and running seems to work, but I don't have much confidence in it
+- **Improve GitHub Actions <> AWS integration** Every time GitHub Actions builds the site it runs a raw script, but this script doesn't interface with GitHub Actions at all which means it's difficult to interpret the results accurately
