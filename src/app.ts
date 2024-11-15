@@ -4,11 +4,12 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import apiRouter from './router.js';
+import logger from './logger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log(__dirname);
+logger.debug(__dirname);
 
 const app = express();
 
