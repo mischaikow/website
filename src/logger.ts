@@ -1,4 +1,8 @@
 import winston from 'winston';
+import fs from 'fs';
+
+const DEBUG_LEVEL = 'debug';
+const WARN_LEVEL = 'warn';
 
 const levels = {
   error: 0,
@@ -11,7 +15,7 @@ const levels = {
 const level = () => {
   const env = process.env.NODE_ENV || 'development';
   const isDevelopment = env === 'development';
-  return isDevelopment ? 'debug' : 'warn';
+  return isDevelopment ? DEBUG_LEVEL : WARN_LEVEL;
 };
 
 const colors = {
@@ -38,7 +42,15 @@ const gitLogFileName = () => {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds().toString().padStart(2, '0');
 
-  return `logs/${year}-${month}-${day}-${hours}-${minutes}-${seconds}.log`;
+  const logFileName = `logs/${year}-${month}-${day}-${hours}-${minutes}-${seconds}.log`;
+
+  if (level() === WARN_LEVEL) {
+    if (!fs.existsSync('/app/logs')) {
+      fs.mkdirSync('/app/logs');
+    }
+    return `/app/${logFileName}`;
+  }
+  return logFileName;
 };
 
 const logger = winston.createLogger({

@@ -12,9 +12,10 @@ cd /home/ec2-user/website
 docker buildx build --no-cache -t site/server -f Dockerfile .
 docker stop mischaikow-server
 docker run --rm -d -p 3000:3000 \
+    -v /home/ec2-user/logs:/app/logs \
     --network=mischaikow-home --name mischaikow-server --init site/server
 
-sleep 30s
+sleep 90s
 server=curl http://127.0.0.1:3000/healthcheck
 dt=$(date '+%d/%m/%Y %H:%M:%S')
 if [ $server == 'OK']
