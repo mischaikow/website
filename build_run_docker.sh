@@ -11,7 +11,7 @@ echo 'Building and deploying server'
 cd /home/ec2-user/website
 docker buildx build --no-cache -t site/server -f Dockerfile .
 docker stop mischaikow-server
-docker run --rm -d -p 3000:3000 \
+docker run --rm -d -p 3000:3000 -e NODE_ENV=production \
     -v /home/ec2-user/logs:/app/logs \
     --network=mischaikow-home --name mischaikow-server --init site/server
 
