@@ -48,6 +48,11 @@ const gitLogFileName = () => {
     if (!fs.existsSync('/app/logs')) {
       fs.mkdirSync('/app/logs');
     }
+
+    if (!fs.existsSync(`/app/${logFileName}`)) {
+      fs.writeFileSync(`/app/${logFileName}`, '');
+    }
+
     return `/app/${logFileName}`;
   }
   return logFileName;
