@@ -16,9 +16,9 @@ docker run --rm -d -p 3000:3000 -e NODE_ENV=production \
     --network=mischaikow-home --name mischaikow-server --init site/server
 
 sleep 90s
-server=curl http://127.0.0.1:3000/healthcheck
+server=$(curl http://127.0.0.1:3000/healthcheck)
 dt=$(date '+%d/%m/%Y %H:%M:%S')
-if [ $server == 'OK']
+if [ $server == 'OK' ];
 then
     echo 'Server is operating' $dt
 else
@@ -42,8 +42,6 @@ then
 else
     echo 'Nginx is NOT up and running -- check reverse proxy' $dt
 fi
-
-docker system prune -f
 
 dt=$(date '+%d/%m/%Y %H:%M:%S')
 echo 'Script complete at' $dt
