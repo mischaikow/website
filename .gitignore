@@ -3,3 +3,4 @@ dist
 coverage
 logs/*.log
 **/*.code-workspace
+.DS_Store
