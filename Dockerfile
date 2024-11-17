@@ -23,6 +23,9 @@ WORKDIR /app
 COPY --from=build --chown=node:node /app/dist /app/dist
 COPY --from=build --chown=node:node /app/node_modules /app/node_modules
 COPY --from=build --chown=node:node /app/package.json /app/package.json
+COPY --from=build --chown=node:node /app/src/templates /app/src/templates
+## COPY --from=build --chown=node:node /app/pnpm-lock.yaml /app/pnpm-lock.yaml
+COPY --chown=node:node ./static /app/static
 
 EXPOSE 3000:3000
 USER node
