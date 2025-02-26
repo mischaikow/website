@@ -56,6 +56,11 @@ h3 {
   top: 1.5px;
 }
 
+.scoundrel {
+  flex: 1;
+  text-align: center;
+}
+
 nav {
   background-color: green;
   text-align: center;
