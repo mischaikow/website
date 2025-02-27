@@ -7,6 +7,10 @@ onmessage = async (event) => {
   if (data['type'] == 'push') {
     console.log('push');
     console.log(data);
+    readJsInput(data.value);
+    on_gameupdate(pyodide.globals.get('game_state'));
+    console.log('message sent');
+    console.log(pyodide.globals.get('game_state'));
   } else if (data['type'] == 'reset') {
     console.log('reset');
     console.log(data);
@@ -43,3 +47,4 @@ const pythonCode = await loadPythonFile(relative_url);
 pyodide.runPython(pythonCode);
 
 on_gameupdate(pyodide.globals.get('game_state'));
+const readJsInput = pyodide.globals.get('read_js_input');

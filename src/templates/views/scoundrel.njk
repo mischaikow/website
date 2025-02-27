@@ -10,6 +10,8 @@
       const data = event.data;
       if (data.type === "gamestatus") {
         document.getElementById('game-display').innerHTML = data.body
+        console.log('message received - gamestatus')
+        console.log(data.body)
       } else if (data.type === "error") {
         // manage the error
       } else if (data.type === "gameover") {
@@ -28,10 +30,8 @@
     }
   }
 
-  async function processInput() {
-    readInput = document.getElementById("inputField").value;
-    console.log(readInput)
-    await do_message("push", readInput)
+  async function processInput(aStr) {
+    await do_message("push", aStr)
   }
 
   async function resetGame() {
@@ -50,9 +50,12 @@
     Stuff goes here
   </div>
 
-  <input name="inputField" type="text" maxLength="1" id="inputField">
+  <button onClick="processInput('1')">1</button>
+  <button onClick="processInput('2')">2</button>
+  <button onClick="processInput('3')">3</button>
+  <button onClick="processInput('4')">4</button>
 
-  <button onClick="processInput()">Enter</button>
+  <button onClick="processInput('S')">Skip Room</button>
 
   <button onClick="resetGame()">Restart</button>
 </div>

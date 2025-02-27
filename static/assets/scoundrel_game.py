@@ -285,6 +285,15 @@ def print_game_state(game: Game) -> str:
 
 
 # Input management
+def read_js_input(a_str: str) -> None:
+    if a_str.isdigit():
+        a_str = str(int(a_str) - 1)
+    game.play(a_str)
+    global game_state
+    game_state = print_game_state(game)
+    print(game_state)
+
+
 def read_input(game: Game) -> str:
     while True:
 
