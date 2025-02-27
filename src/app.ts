@@ -15,6 +15,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../static')));
+app.use('/js', express.static(path.join(__dirname, './scripts')));
 
 app.set('port', 3000);
 

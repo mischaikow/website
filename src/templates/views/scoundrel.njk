@@ -1,17 +1,61 @@
 {% include "common/site-head.njk" %}
 <title>Scoundrel</title>
+<script>
+  function initWorker() {
+    globalThis.pyodideWorker = new Worker("/js/scoundrel_webworker.js", {
+      type: "module",
+    })
+
+    pyodideWorker.onmessage = async function (event) {
+      const data = event.data;
+      if (data.type === "gamestatus") {
+        document.getElementById('game-display').innerHTML = data.body
+      } else if (data.type === "error") {
+        // manage the error
+      } else if (data.type === "gameover") {
+        // show the game over splash screen
+      }
+    }
+
+    globalThis.do_message = async function (type, str) {
+      const promise = new Promise((resolve, reject) => {
+        resultPromiseResolver = resolve;
+      })
+      pyodideWorker.postMessage({ type: type, value: str})
+      const retval = await promise
+      resultPromiseResolver = undefined;
+      return await promise
+    }
+  }
+
+  async function processInput() {
+    readInput = document.getElementById("inputField").value;
+    console.log(readInput)
+    await do_message("push", readInput)
+  }
+
+  async function resetGame() {
+    await do_message("reset", "")
+  }
+</script>
 
 {% include "common/site-nav.njk" %}
-<body onload="launchGame()">
+<body onload="initWorker()">
+
+
 <div class="scoundrel">
-<h1 style="margin-top: 25px">Scoundrel</h1>
+  <h1 style="margin-top: 25px">Scoundrel</h1>
 
-<div>
-  Stuff goes here
+  <div id="game-display">
+    Stuff goes here
+  </div>
+
+  <input name="inputField" type="text" maxLength="1" id="inputField">
+
+  <button onClick="processInput()">Enter</button>
+
+  <button onClick="resetGame()">Restart</button>
 </div>
-
-
-<button id="process-game-action">Enter</button>
 </body>
 
 
