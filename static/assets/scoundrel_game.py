@@ -1,4 +1,5 @@
 import random
+import json
 from collections import deque
 from enum import Enum
 
@@ -85,7 +86,7 @@ class Game:
 
         self.board = []
 
-        self.weapon: int = None
+        self.weapon: int = 0
         self.weapon_defeat_stack = []
 
         self.room = 0
@@ -153,7 +154,7 @@ class Game:
         self.health = min(20, self.health + card.return_score())
 
     def black_play(self, card: Card) -> None:
-        if self.weapon is None:
+        if self.weapon == 0:
             self.health -= card.return_score()
         elif (
             len(self.weapon_defeat_stack) == 0
@@ -189,98 +190,49 @@ class Game:
 
 ##  Scoundrel interface
 # Printing
-def print_board(game: Game) -> str:
-    board_display = ""
-    for i in range(len(game.board)):
-        board_display += str(i + 1)
-        board_display += "["
-        board_display += str(game.board[i])
-        board_display += "]  "
-    return board_display
+def print_board(game: Game) -> list[str]:
+    return [str(x) for x in game.board]
 
 
 def print_defeat_stack(game: Game) -> str:
     return "  ".join([str(x) for x in game.weapon_defeat_stack])
 
 
-def print_game_weapon(game: Game) -> str:
-    if game.weapon is None:
-        return "Unarmed"
-
-    defeat_stack_string = ""
-    if len(game.weapon_defeat_stack) > 0:
-        defeat_stack_string = ":"
-        defeat_stack_string += " ".join(
-            x.value_string for x in game.weapon_defeat_stack
-        )
-
-    return str(game.weapon) + defeat_stack_string
-
-
-def print_health(game: Game) -> str:
-    return str(game.health)
-
-
-def print_cards_played(game: Game) -> list[str]:
-    result = []
+def format_cards_played(game: Game) -> dict:
+    result = {}
     for s in Suit:
         if len(game.cards_played[s]) > 0:
-            suit_print = s.value
+            result[s.value] = []
 
-            output = []
             for val in game.cards_played[s]:
                 if val == 14:
-                    output.append("A")
+                    result[s.value].append("A")
                 elif val == 11:
-                    output.append("J")
+                    result[s.value].append("J")
                 elif val == 12:
-                    output.append("Q")
+                    result[s.value].append("Q")
                 elif val == 13:
-                    output.append("K")
+                    result[s.value].append("K")
                 else:
-                    output.append(str(val))
-            result.append(f"{suit_print}: {', '.join(output)}")
+                    result[s.value].append(str(val))
     return result
 
 
-def print_skip_room_option(game: Game) -> str:
-    if game.skipped_last_room:
-        return "You cannot skip this room"
-    return "Type 'S' to skip room"
+def format_defeat_stack(defeat_stack: list[Card]) -> list[str]:
+    return [x.value_string for x in defeat_stack]
 
 
-def print_card_choices(game: Game) -> str:
-    return f"pick card 1-{len(game.board)}"
-
-
-def generate_html_string(strings: list[str]) -> str:
-    result = ""
-    for a_str in strings:
-        result += "<p>"
-        result += a_str
-        result += "</p>"
-    return result
-
-
-def print_game_state(game: Game) -> str:
-    return generate_html_string(
-        [
-            f"    Room {game.room}",
-            f"",
-            f" Contains:",
-            f"    {print_board(game)}",
-            f"",
-            f" Weapon:",
-            f"    {print_game_weapon(game)}",
-            f"",
-            f"Health:  {print_health(game)} / 20",
-            f"",
-        ]
-        + print_cards_played(game)
-        + [
-            f"",
-            f"{print_skip_room_option(game)}, {print_card_choices(game)}, or 'Q' to quit:",
-        ]
+def generate_game_state(game: Game) -> str:
+    return json.dumps(
+        {
+            "room": game.room,
+            "board": print_board(game),
+            "weapon": game.weapon,
+            "weapon_chain": format_defeat_stack(game.weapon_defeat_stack),
+            "health": game.health,
+            "cards_played": format_cards_played(game),
+            "skipped_last_room": game.skipped_last_room,
+        }
     )
 
 
@@ -290,37 +242,9 @@ def read_js_input(a_str: str) -> None:
         a_str = str(int(a_str) - 1)
     game.play(a_str)
     global game_state
-    game_state = print_game_state(game)
+    game_state = generate_game_state(game)
     print(game_state)
 
 
-def read_input(game: Game) -> str:
-    while True:
-
-        next_action = input()
-
-        if (
-            next_action.isdigit()
-            and 0 < int(next_action)
-            and int(next_action) <= len(game.board)
-        ):
-            return str(int(next_action) - 1)
-        elif next_action == "s" or next_action == "S":
-            if game.skipped_last_room:
-                print("Not allowed to skip")
-            else:
-                return "skip"
-        elif next_action == "q" or next_action == "Q":
-            return "game over"
-
-
 game = Game()
-game_state = print_game_state(game)
-
-
-def dummy_loop(user_input):
-    while not game.is_game_over():
-        print()
-        print_game_state(game)
-        user_input = read_input(game)
-        game.play(user_input)
+game_state = generate_game_state(game)

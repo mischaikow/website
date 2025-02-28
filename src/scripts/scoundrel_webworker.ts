@@ -17,8 +17,8 @@ onmessage = async (event) => {
   }
 };
 
-function on_gameupdate(str) {
-  postMessage({ type: 'gamestatus', body: str });
+function on_gameupdate(gameState) {
+  postMessage({ type: 'gamestatus', body: JSON.parse(gameState) });
 }
 
 function on_gameover(str) {

@@ -59,6 +59,14 @@ h3 {
 .scoundrel {
   flex: 1;
   text-align: center;
+  font-size: 18px;
+}
+
+#game-display {
+  min-height: 200px;
+  min-width: 200px;
+  padding-bottom: 20px;
+  position: relative;
 }
 
 nav {

@@ -9,7 +9,7 @@
     pyodideWorker.onmessage = async function (event) {
       const data = event.data;
       if (data.type === "gamestatus") {
-        document.getElementById('game-display').innerHTML = data.body
+        writeGameState(data.body)
         console.log('message received - gamestatus')
         console.log(data.body)
       } else if (data.type === "error") {
@@ -30,6 +30,99 @@
     }
   }
 
+  function buttonDisplay(roomContents) {
+    if (roomContents.length < 4) {
+      document.getElementById("button4").style.display = "none";
+    } else {
+      document.getElementById("button4").style.display = "inline-block";
+    }
+
+    if (roomContents.length < 3) {
+      document.getElementById("button3").style.display = "none";
+    } else {
+      document.getElementById("button3").style.display = "inline-block";
+    }
+
+  }
+
+  function roomDisplay(roomContents) {
+    output = ""
+    for (let i = 0; i < roomContents.length; i++) {
+      if (i > 0) {
+        output = output + "&nbsp;&nbsp;&nbsp;"
+      }
+      output = output + "<sup>" + (i+1).toString() + "</sup>"
+      if (roomContents[i][2] === '♥' || roomContents[i][2] === '♦') {
+        output = output + "<span style='color: red;'>" + roomContents[i] + "</span>"
+      } else {
+        output = output + roomContents[i]
+      }
+    }
+    document.getElementById("roomContents").innerHTML = output
+  }
+
+  function weaponDisplay(weapon, weaponChain) {
+    output = "Weapon: "
+    if (weapon === 0) {
+      output = output + "unarmed"
+    } else {
+      output = output + "<span style='font-weight: 700;'>" + weapon + "</span>"
+    }
+    if (weaponChain.length > 0) {
+      output = output + " | "
+      for (let i = 0; i < weaponChain.length; i++) {
+        output = output + weaponChain[i] + " "
+      }
+    }
+    document.getElementById("weapon").innerHTML = output
+  }
+
+  function healthDisplay(health) {
+    if (health < 10) {
+      document.getElementById("health").innerHTML = "<span style='color: red;'>" + health + "</span>"
+    } else {
+      document.getElementById("health").innerHTML = health
+    }
+  }
+
+  function cardsPlayedDisplay(cardsPlayed) {
+    output = ""
+    for (let key in cardsPlayed) {
+      output = output + "<div>"
+      if (key === '♥' || key === '♦') {
+        output = output + "<span style='color: red;'>" + key + "</span>"
+      } else {
+        output = output + key
+      }
+      output = output + ": "
+      for (let i = 0; i < cardsPlayed[key].length; i++) {
+        output = output + cardsPlayed[key][i] + " "
+      }
+      output = output + "</div>"
+    }
+    document.getElementById("cardsPlayed").innerHTML = output
+  }
+
+  function roomSkipStatusDisplay(skipped_last_room) {
+    if (skipped_last_room) {
+      document.getElementById("lastRoomSkipped").innerHTML = "Cannot sip this room."
+      document.getElementById("buttonS").setAttribute("disabled", "disabled")
+    } else {
+      document.getElementById("lastRoomSkipped").innerHTML = ""
+      document.getElementById("buttonS").removeAttribute("disabled")
+    }
+  }
+
+  function writeGameState(gameState) {
+    document.getElementById("roomNumber").innerHTML = gameState.room
+    roomDisplay(gameState.board)
+    weaponDisplay(gameState.weapon, gameState.weapon_chain)
+    healthDisplay(gameState.health)
+    cardsPlayedDisplay(gameState.cards_played)
+    roomSkipStatusDisplay(gameState.skipped_last_room)
+    buttonDisplay(gameState.board)
+  }
+
   async function processInput(aStr) {
     await do_message("push", aStr)
   }
@@ -47,17 +140,23 @@
   <h1 style="margin-top: 25px">Scoundrel</h1>
 
   <div id="game-display">
-    Stuff goes here
+    <div style="padding-bottom: 15px;">Room: <span id="roomNumber"></span></div>
+    <div id="roomContents" style="padding-bottom: 25px;"></div>
+    <div style="padding-bottom: 5px;" id="weapon"></div>
+    <div style="padding-bottom: 15px;">HP <span id="health" style="font-weight: 700;"></span> / 20</div>
+    <div id="cardsPlayed"></div>
+
   </div>
+  <div id="lastRoomSkipped"></div>
 
-  <button onClick="processInput('1')">1</button>
-  <button onClick="processInput('2')">2</button>
-  <button onClick="processInput('3')">3</button>
-  <button onClick="processInput('4')">4</button>
+  <button id="button1" onClick="processInput('1')">1</button>
+  <button id="button2" onClick="processInput('2')">2</button>
+  <button id="button3" onClick="processInput('3')">3</button>
+  <button id="button4" onClick="processInput('4')">4</button>
 
-  <button onClick="processInput('S')">Skip Room</button>
+  <button id="buttonS" onClick="processInput('S')">Skip Room</button>
 
-  <button onClick="resetGame()">Restart</button>
+  <button id="buttonQ" onClick="resetGame()">Restart</button>
 </div>
 </body>
 
