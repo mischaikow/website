@@ -30,17 +30,18 @@
     "@types/node": "^20.10.7",
     "@types/nodemailer": "^6.4.17",
     "@types/nunjucks": "^3.2.6",
-    "@typescript-eslint/eslint-plugin": "^6.18.1",
-    "@typescript-eslint/parser": "^6.18.1",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
     "@vitest/coverage-v8": "^1.2.2",
     "chokidar": "^3.5.3",
     "concurrently": "^8.2.2",
-    "eslint": "^8.56.0",
+    "eslint": "^9.21.0",
     "eslint-config-prettier": "^9.1.0",
     "nodemon": "^3.0.3",
     "prettier": "^3.1.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "vitest": "^1.2.2"
-  }
+  },
+  "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
 }
