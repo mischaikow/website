@@ -75,7 +75,20 @@ h3 {
   grid-row: 1;
 }
 
-#game-layer {
+#game-display {
+  display: grid;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+  height: 240px;
+  margin: auto;
+}
+#game-display > * {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#game-layer,
+#game-infoscreen {
   z-index: 1;
 }
 

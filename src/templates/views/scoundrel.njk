@@ -1,6 +1,7 @@
 {% include "common/site-head.njk" %}
 <title>Scoundrel</title>
 <script>
+
   function initWorker() {
     globalThis.pyodideWorker = new Worker("/js/scoundrel_webworker.js", {
       type: "module",
@@ -12,12 +13,10 @@
         writeGameState(data.body)
         console.log('message received - gamestatus')
         console.log(data.body)
-      } else if (data.type === "error") {
-        // manage the error
       } else if (data.type === "gamewon") {
-        // show the game over splash screen
+        gameOverSplashScreen("You escaped!")
       } else if (data.type === "gamelost") {
-        // show the game over splash screen
+        gameOverSplashScreen("You died.")
       }
     }
 
@@ -33,18 +32,15 @@
   }
 
   function buttonDisplay(roomContents) {
-    if (roomContents.length < 4) {
-      document.getElementById("button4").style.display = "none";
-    } else {
-      document.getElementById("button4").style.display = "inline-block";
+    for (let i = 1; i < 5; i++) {
+      buttonName = "button" + i.toString()
+      if (roomContents.length < i) {
+        document.getElementById(buttonName).style.display = "none";
+      } else {
+        document.getElementById(buttonName).removeAttribute("disabled");
+        document.getElementById(buttonName).style.display = "inline-block";
+      }
     }
-
-    if (roomContents.length < 3) {
-      document.getElementById("button3").style.display = "none";
-    } else {
-      document.getElementById("button3").style.display = "inline-block";
-    }
-
   }
 
   function roomDisplay(roomContents) {
@@ -107,16 +103,28 @@
 
   function roomSkipStatusDisplay(skipped_last_room) {
     if (skipped_last_room) {
-      document.getElementById("lastRoomSkipped").innerHTML = "Cannot skip this room."
-      document.getElementById("buttonS").setAttribute("disabled", "disabled")
+      document.getElementById("lastRoomSkipped").innerHTML = "Cannot skip this room.";
+      document.getElementById("buttonS").setAttribute("disabled", "disabled");
     } else {
-      document.getElementById("lastRoomSkipped").innerHTML = ""
-      document.getElementById("buttonS").removeAttribute("disabled")
+      document.getElementById("lastRoomSkipped").innerHTML = "";
+      document.getElementById("buttonS").removeAttribute("disabled");
     }
   }
 
-  function clearLoadingScreen() {
+  function gameOverSplashScreen(message) {
+    document.getElementById("gameEndScreen").innerHTML = message;
+    document.getElementById("gameEndScreen").style.visibility = "visible";
+
+    const actionButtons = ["button1", "button2", "button3", "button4", "buttonS"]
+    actionButtons.forEach((buttonName) => {
+      document.getElementById(buttonName).style.display = "inline-block";
+      document.getElementById(buttonName).setAttribute("disabled", "disabled");
+    })
+  }
+
+  function clearSplashScreens() {
     document.getElementById("loadingScreen").style.visibility = "hidden";
+    document.getElementById("gameEndScreen").style.visibility = "hidden";
   }
 
   function writeGameState(gameState) {
@@ -127,7 +135,7 @@
     cardsPlayedDisplay(gameState.cards_played)
     roomSkipStatusDisplay(gameState.skipped_last_room)
     buttonDisplay(gameState.board)
-    clearLoadingScreen()
+    clearSplashScreens()
   }
 
   async function processInput(aStr) {
@@ -147,15 +155,17 @@
 
   <div id="game-enclosure">
     <div id="game-layer">
-      <div id="game-display" style="height: 240px;">
-        <div style="padding-bottom: 15px;">Room: <span id="roomNumber"></span></div>
-        <div id="roomContents" style="padding-bottom: 25px;"></div>
-        <div style="padding-bottom: 5px;" id="weapon"></div>
-        <div style="padding-bottom: 15px;">HP <span id="health" style="font-weight: 700;"></span> / 20</div>
-        <div id="cardsPlayed"></div>
+      <div id="game-display">
+        <div id="infoscreen" style="height: 100%;">
+          <div style="padding-bottom: 15px;">Room: <span id="roomNumber"></span></div>
+          <div id="roomContents" style="padding-bottom: 25px;"></div>
+          <div style="padding-bottom: 5px;" id="weapon"></div>
+          <div style="padding-bottom: 15px;">HP <span id="health" style="font-weight: 700;"></span> / 20</div>
+          <div id="cardsPlayed"></div>
+        </div>
 
+        <div class="splash" id="gameEndScreen"></div>
       </div>
-      <div class="splash" id="gameEndScreen"></div>
 
       <div id="lastRoomSkipped" style="height: 24px;"></div>
 

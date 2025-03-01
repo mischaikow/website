@@ -1,5 +1,17 @@
 import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.mjs';
 
+interface GameState {
+  room: number;
+  board: Array<string>;
+  weapon: number;
+  weapon_chain: Array<number>;
+  health: number;
+  cards_played: object;
+  skipped_last_room: boolean;
+  is_victory: boolean;
+  is_defeat: boolean;
+}
+
 const pyodide = await loadPyodide();
 
 onmessage = async (event) => {
@@ -13,10 +25,10 @@ onmessage = async (event) => {
   }
 
   console.log(data);
-  processGameState(pyodide.globals.get('game_state'));
+  processGameState(JSON.parse(pyodide.globals.get('game_state')));
 };
 
-const processGameState = (gameState) => {
+const processGameState = (gameState: GameState) => {
   if (gameState.is_victory) {
     on_gamewon(gameState);
   } else if (gameState.is_defeat) {
@@ -28,24 +40,20 @@ const processGameState = (gameState) => {
   console.log(pyodide.globals.get('game_state'));
 };
 
-const on_gameupdate = (gameState) => {
-  postMessage({ type: 'gamestatus', body: JSON.parse(gameState) });
+const on_gameupdate = (gameState: GameState) => {
+  postMessage({ type: 'gamestatus', body: gameState });
 };
 
-const on_gamewon = (str) => {
-  postMessage({ type: 'gamewon', body: str });
+const on_gamewon = (gameState: GameState) => {
+  postMessage({ type: 'gamewon', body: gameState });
 };
 
-const on_gamelost = (str) => {
-  postMessage({ type: 'gamelost', body: str });
-};
-
-const on_error = (str) => {
-  postMessage({ type: 'error', body: str });
+const on_gamelost = (gameState: GameState) => {
+  postMessage({ type: 'gamelost', body: gameState });
 };
 
 const relative_url = '../assets/scoundrel_game.py';
-async function loadPythonFile(url) {
+async function loadPythonFile(url: string) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -61,5 +69,5 @@ async function loadPythonFile(url) {
 const pythonCode = await loadPythonFile(relative_url);
 pyodide.runPython(pythonCode);
 
-on_gameupdate(pyodide.globals.get('game_state'));
+on_gameupdate(JSON.parse(pyodide.globals.get('game_state')));
 const readJsInput = pyodide.globals.get('read_js_input');
