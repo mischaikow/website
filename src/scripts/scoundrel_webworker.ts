@@ -6,28 +6,43 @@ onmessage = async (event) => {
   const data = event.data;
   if (data['type'] == 'push') {
     console.log('push');
-    console.log(data);
     readJsInput(data.value);
-    on_gameupdate(pyodide.globals.get('game_state'));
-    console.log('message sent');
-    console.log(pyodide.globals.get('game_state'));
   } else if (data['type'] == 'reset') {
     console.log('reset');
-    console.log(data);
+    readJsInput('reset');
   }
+
+  console.log(data);
+  processGameState(pyodide.globals.get('game_state'));
 };
 
-function on_gameupdate(gameState) {
+const processGameState = (gameState) => {
+  if (gameState.is_victory) {
+    on_gamewon(gameState);
+  } else if (gameState.is_defeat) {
+    on_gamelost(gameState);
+  } else {
+    on_gameupdate(gameState);
+  }
+  console.log('message sent');
+  console.log(pyodide.globals.get('game_state'));
+};
+
+const on_gameupdate = (gameState) => {
   postMessage({ type: 'gamestatus', body: JSON.parse(gameState) });
-}
+};
 
-function on_gameover(str) {
-  postMessage({ type: 'gameover', body: str });
-}
+const on_gamewon = (str) => {
+  postMessage({ type: 'gamewon', body: str });
+};
 
-function on_error(str) {
+const on_gamelost = (str) => {
+  postMessage({ type: 'gamelost', body: str });
+};
+
+const on_error = (str) => {
   postMessage({ type: 'error', body: str });
-}
+};
 
 const relative_url = '../assets/scoundrel_game.py';
 async function loadPythonFile(url) {

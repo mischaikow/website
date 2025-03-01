@@ -94,7 +94,8 @@ class Game:
 
         self.skipped_last_room = False
 
-        self.game_ended = False
+        self.is_victory = False
+        self.is_defeat = False
 
         self.next_room()
 
@@ -103,7 +104,7 @@ class Game:
         top_card = self.deck.draw_card()
         if top_card is None:
             print("You escaped!")
-            self.game_ends()
+            self.is_victory = True
 
         self.board.append(top_card)
 
@@ -124,12 +125,15 @@ class Game:
     def play(self, user_input: str) -> None:
         if user_input.isdigit():
             self.card_play(int(user_input))
-        elif user_input == "skip":
+        elif user_input == "S":
             self.next_room()
-        elif user_input == "game over":
-            self.game_ends()
         else:
-            print("PANIC")
+            ## TODO ~ Insert error.
+            pass
+        
+        # Did you die?
+        if self.health <= 0:
+            self.is_defeat = True
 
     def card_play(self, card_index: int) -> None:
         played_card = self.board.pop(card_index)
@@ -165,27 +169,6 @@ class Game:
         else:
             self.health -= card.return_score()
 
-    # Information displays
-
-    # Game status
-    def is_game_over(self) -> bool:
-        if self.game_ended:
-            return True
-
-        if self.deck.deck_size() == 0:
-            self.game_ends()
-            print("you escaped!")
-            return True
-
-        if self.health <= 0:
-            self.game_ends()
-            print("you died.")
-            return True
-
-        return False
-
-    def game_ends(self):
-        self.game_ended = True
 
 
 ##  Scoundrel interface
@@ -232,6 +215,8 @@ def generate_game_state(game: Game) -> str:
             "health": game.health,
             "cards_played": format_cards_played(game),
             "skipped_last_room": game.skipped_last_room,
+            "is_victory": game.is_victory,
+            "is_defeat": game.is_defeat,
         }
     )
 
@@ -240,10 +225,15 @@ def generate_game_state(game: Game) -> str:
 def read_js_input(a_str: str) -> None:
     if a_str.isdigit():
         a_str = str(int(a_str) - 1)
-    game.play(a_str)
+
+    if a_str == 'reset':
+        global game
+        game = Game()
+    else:
+        game.play(a_str)
+
     global game_state
     game_state = generate_game_state(game)
-    print(game_state)
 
 
 game = Game()

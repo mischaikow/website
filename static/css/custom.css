@@ -62,11 +62,31 @@ h3 {
   font-size: 18px;
 }
 
-#game-display {
-  min-height: 200px;
-  min-width: 200px;
-  padding-bottom: 20px;
-  position: relative;
+#game-enclosure {
+  display: grid;
+  grid-template: 1fr / 1fr;
+  place-items: center;
+  width: 300px;
+  height: 300px;
+  margin: auto;
+}
+#game-enclosure > * {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#game-layer {
+  z-index: 1;
+}
+
+.splash {
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
 }
 
 nav {
