@@ -19,11 +19,11 @@ jobs:
           aws-region: us-east-1
       - name: Pull & build repository
         id: repo-build
-        run: | 
+        run: |
           echo "CMDID=$(aws ssm send-command \
             --instance-ids 'i-03c0a5504af2c0cff' \
             --document-name 'AWS-RunShellScript' \
-            --parameters commands='bash /home/ec2-user/website/build_run_docker.sh' \
+            --parameters commands='bash /home/ec2-user/website/build_run_docker.sh > /home/ec2-user/logs/deploy.log' \
             --query 'Command.CommandId' --output text)" >> $GITHUB_ENV
       - name: Wait...
         run: sleep 200s
