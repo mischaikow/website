@@ -104,10 +104,16 @@ h3 {
 
 nav {
   background-color: green;
-  text-align: center;
+  display: flex;
+  justify-content: center;
   height: 35px;
   line-height: 35px;
   font-size: 20px;
+}
+
+.site-nav-link {
+  width: 110px;
+  text-align: center;
 }
 
 .footer {
