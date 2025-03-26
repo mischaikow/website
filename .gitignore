@@ -1,6 +1,7 @@
 node_modules
 dist
 coverage
+certbot
 logs/*.log
 **/*.code-workspace
-.DS_Store
+**/.DS_Store
